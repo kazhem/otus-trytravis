@@ -1,19 +1,26 @@
 # kazhem_infra
-kazhem Infra repository
+Kazhemskiy Mikhail OTUS-DevOps-2020-02 Infra repository
 
 
 # Домашние задания
 ## HomeWork 2: GitChatOps
-Будет заполнено
+* Создан шаблон PR
+* Создана интеграция с TravisCI
+```bash
+ travis encrypt "devops-team-otus:<ваш_токен>#<имя_вашего_канала>" --add notifications.slack.rooms --com
+```
+* Создана интеграция с чатом для репозитория
+* Создана интеграция с чатом для TravisCI
+* Отработаны навыки работы с GIT
 ## HomeWork3: Знакомство с облачной инфраструктурой.pdf
 * Создана УЗ для GCP
-* Создана пара ssh ключей `~/.ssh/kazhem` и публичная часть была добавлена в метаданные в Compute Engine GCP
+* Создана пара ssh ключей `~/.ssh/appuser` и публичная часть была добавлена в метаданные в Compute Engine GCP
 * В Compute Engine были созданы две виртуальные машины - **bostion**, с внешним IP адресом `35.195.154.67` (и внутренним `10.132.0.2`) и **someinternalhost** только с внутренним IP адресом `10.132.0.3` (**без внешнего**)
 * Для подключения **someinternalhost** необходимо сначала подключиться по **ssh** к хосту **bostion** с включенным SSH Agent Forwarding (параметр -A) и затем с него выполнить подключение по **ssh** к хосту `10.132.0.3`:
-    ```
-    ssh -A -i ~/.ssh/kazhem kazhem@35.195.154.67
-    kazhem@bastion:~$ ssh kazhem@10.132.0.3
-    kazhem@someinternalhost:~$ hostname
+    ```bash
+    ssh -A -i ~/.ssh/appuser appuser@35.195.154.67
+    appuser@bastion:~$ ssh appuser@10.132.0.3
+    appuser@someinternalhost:~$ hostname
     someinternalhost
     ```
  * Для подключения одной командой, минуя bastion хост можно:
@@ -26,46 +33,46 @@ kazhem Infra repository
              separated by comma characters.  This is a shortcut to specify a
              ProxyJump configuration directive.
         ```
-       ```
-       ssh -i ~/.ssh/kazhem -J kazhem@35.195.154.67 kazhem@10.132.0.3
-       kazhem@someinternalhost:~$ hostname
+       ```bash
+       ssh -i ~/.ssh/appuser -J appuser@35.195.154.67 appuser@10.132.0.3
+       appuser@someinternalhost:~$ hostname
        someinternalhost
        ```
     * через proxycommand с перенаправлением ввода:
-      ```
-      ssh kazhem@10.132.0.3 -o "proxycommand ssh -W %h:%p -i ~/.ssh/kazhem kazhem@35.195.154.67"
+      ```bash
+      ssh appuser@10.132.0.3 -o "proxycommand ssh -W %h:%p -i ~/.ssh/appuser appuser@35.195.154.67"
       ```
 * Для того, чтобы подключаться к **someinternalhost** через команду `ssh someinternalhost` необходимо создать файл `~/.ssh/config` добавив в него следующее содержимое:
     * Для ProxyJump:
         ```
         Host bastion
                 HostName 35.195.154.67
-                User kazhem
+                User appuser
                 Port 22
-                IdentityFile ~/.ssh/kazhem
+                IdentityFile ~/.ssh/appuser
                 ForwardAgent yes
 
         Host someinternalhost
                 HostName 10.132.0.3
-                User kazhem
+                User appuser
                 Port 22
-                IdentityFile ~/.ssh/kazhem
+                IdentityFile ~/.ssh/appuser
                 ProxyJump bastion
         ```
     * Для ProxyCommand:
         ```
         Host bastion
                 HostName 35.195.154.67
-                User kazhem
+                User appuser
                 Port 22
-                IdentityFile ~/.ssh/kazhem
+                IdentityFile ~/.ssh/appuser
                 ForwardAgent yes
 
         Host someinternalhost
                 HostName 10.132.0.3
-                User kazhem
+                User appuser
                 Port 22
-                IdentityFile ~/.ssh/kazhem
+                IdentityFile ~/.ssh/appuser
                 ProxyCommand ssh -W %h:%p bastion
         ```
  * Установлен и настроен VPN-сервер [pritunl](https://pritunl.com/)
