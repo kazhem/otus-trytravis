@@ -1,12 +1,6 @@
 # kazhem_infra
 Kazhemskiy Mikhail OTUS-DevOps-2020-02 Infra repository
 
-~~~
-
-testapp_IP = 35.189.238.97
-testapp_port = 9292
-
-~~~
 
 # Домашние задания
 ## HomeWork 2: GitChatOps
@@ -96,7 +90,12 @@ someinternalhost_IP = 10.132.0.3
    * Веб-интерфейс доступен по адресу https://35.195.154.67.sslip.io/ с валидным сертификатом
 
 ## HomeWork4: Основные сервисы Google Cloud Platform (GCP)
+~~~
 
+testapp_IP = 35.189.238.97
+testapp_port = 9292
+
+~~~
 * Сделана установка и настройка [gcloud](https://cloud.google.com/sdk/docs/)
 * С помощью утилиты gcloud была создана тестовая ВМ c названием **reddit-app**
     ```
