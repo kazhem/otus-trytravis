@@ -131,3 +131,27 @@ testapp_port = 9292
       --allow tcp:9292 \
       --target-tags=puma-server
     ```
+## HomeWork5: Модели управления инфраструктурой Packer
+* Произведена установка [Packer](https://www.packer.io/downloads.html) на локальную машину
+* Установлен и авторизовн **Application Default Credentials** (ADC) для того, чтобы Packer мог управлять ресурсами GCP через API вызовы
+  ```
+  gcloud auth application-default login
+  ```
+* Создан Packer template [ubuntu16.json](packer/ubuntu16.json)
+    * Настроены **builders**, отвечающий за создание ВИ для билда
+    * Настроены **provisioners** с типо _shell_, устанавливающие MongoDB и Ruby с помощью скриптов [install_mongodb.sh](packer/scripts/install_mongodb.sh) и [install_ruby.sh](packer/scripts/install_ruby.sh)
+* [ubuntu16.json](packer/ubuntu16.json) проверен на наличие ошибок в синтакисисе
+   ```
+   packer validate ./ubuntu16.json
+   ```
+* Собран образ из шаблона [ubuntu16.json](packer/ubuntu16.json)
+   ```
+   packer build ubuntu16.json
+   ```
+* Создана ВМ через GUI GCP из собранного раннее образа
+* Вручную, через SSH, установлен и запущен puma server
+* Добавлены пользовательские переменные, обязателные вынесены в файл variables.json
+* Запущена сборка образа с пользвательскими переменными
+  ```
+  packer build --var-file variables.json ubuntu16.json
+  ```
