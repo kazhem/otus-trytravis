@@ -151,7 +151,23 @@ testapp_port = 9292
 * Создана ВМ через GUI GCP из собранного раннее образа
 * Вручную, через SSH, установлен и запущен puma server
 * Добавлены пользовательские переменные, обязателные вынесены в файл variables.json
+    ```
+    "variables": {
+        "project_id": null,
+        "source_image_family": null,
+        "machine_type": "f1-micro",
+        "ssh_username": "appuser"
+    },
+    ```
 * Запущена сборка образа с пользвательскими переменными
   ```
   packer build --var-file variables.json ubuntu16.json
+  ```
+* Добавлены новые поля в builders:
+  ```
+  "image_description": "Reddit base app image with mongo and redis installed",
+   "disk_size": 10,
+   "disk_type": "pd-standard",
+   "network": "default",
+   "tags": ["puma-server"],
   ```
