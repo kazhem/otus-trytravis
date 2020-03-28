@@ -1,0 +1,40 @@
+{
+  "variables": {
+    "project_id": null,
+    "source_image_family": null,
+    "machine_type": "f1-micro",
+    "ssh_username": "appuser",
+    "disk_size": "10",
+    "network": "default",
+    "tags": ""
+  },
+  "builders": [
+    {
+    "type": "googlecompute",
+    "project_id": "{{ user `project_id` }}",
+    "image_name": "reddit-full-{{timestamp}}",
+    "image_description": "Reddit Full image with mongo, redis and reddit app enabled on startup",
+    "disk_size": "{{ user `disk_size`}}",
+    "disk_type": "pd-standard",
+    "network": "{{ user `network`}}",
+    "tags": "{{ user `tags`}}",
+    "source_image_family": "{{ user `source_image_family` }}",
+    "ssh_username": "{{ user `ssh_username` }}",
+    "machine_type": "{{ user `machine_type` }}",
+    "image_family": "reddit-full",
+    "zone": "europe-west1-b"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "file",
+      "source": "files/puma.service",
+      "destination": "/tmp/puma.service"
+    },
+    {
+      "type": "shell",
+      "script": "scripts/startup_script.sh",
+      "execute_command": "sudo {{.Path}}"
+    }
+  ]
+}

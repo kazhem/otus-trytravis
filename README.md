@@ -171,3 +171,8 @@ testapp_port = 9292
    "network": "default",
    "tags": ["puma-server"],
   ```
+ ### Задание со *
+ * Создан [puma.service](packer/files/puma.service) файл для автоматического запуска приложения
+ * Создан файл [startup_script.sh](packer/scripts/startup_script.sh) для установки и настройки сервиса для старта прложения при запуске ВМ
+ * Создан конфиг [immutable.json](packer/immutable.json) для packer, создающий образ семейства reddit-full с bake образом приложения
+ * Создан файл [create-reddit-vm.sh](config-scripts/create-reddit-vm.sh),запускающий команду gloud, создающую ВМ на основе образа reddit-full.
