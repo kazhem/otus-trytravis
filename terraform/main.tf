@@ -16,7 +16,7 @@ resource "google_compute_instance" "app" {
   name = "reddit-app"
   machine_type = "g1-small"
   tags = ["reddit-app"]
-  zone = "europe-west1-b"
+  zone = var.zone
   boot_disk {
     initialize_params {
       image = var.disk_image
@@ -37,7 +37,7 @@ resource "google_compute_instance" "app" {
     user = "appuser"
     agent = false
     # путь до приватного ключа
-    private_key = file("~/.ssh/appuser")
+    private_key = file(var.private_key)
   }
   provisioner "file" {
     source = "files/puma.service"
