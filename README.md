@@ -176,3 +176,27 @@ testapp_port = 9292
  * Создан файл [startup_script.sh](packer/scripts/startup_script.sh) для установки и настройки сервиса для старта прложения при запуске ВМ
  * Создан конфиг [immutable.json](packer/immutable.json) для packer, создающий образ семейства reddit-full с bake образом приложения
  * Создан файл [create-reddit-vm.sh](config-scripts/create-reddit-vm.sh),запускающий команду gloud, создающую ВМ на основе образа reddit-full.
+
+## Homework6: Знакомство с Terraform
+### Основное задание
+* Установлен [Terraform](https://www.terraform.io/downloads.html)
+  * [Getting Started Guide](https://www.terraform.io/docs/providers/google/guides/getting_started.html)
+* Cоздан файл [main.tf](terrafiorm/main.tf), где были указазаны основные параметры подключения: версия terraform, provider (google), ID проекта и регион.
+* Инициализоровна terraform:
+  ```
+  terraform init
+  ```
+* В файл [main.tf](terrafiorm/main.tf) добавлен ресурс [google_compute_instance](https://www.terraform.io/docs/providers/google/r/compute_instance.html) а так же boot_disk - образ, с которого создавать VM
+* Основные команды:
+  * `terraform plan` - запланировать изменения (посмотреть, что будет сделано при применении)
+  * `terraform apply --auto-approve` - применить изменения с автоподтверждением
+  * `terraform show` - показать текущее состаяние TF. К примерну показать внешний IP: `terraform show | grep nat_ip`
+  * `terraform destroy` - удалить все созданные ресурсы
+* Добавлен SSH-ключ для подключения в metadata **инстанса**
+* Добавлен файл [outputs.tf](terraform/outputs.tf) для создания выхоных переменных
+* Добавлен ресурс *google_compute_firewall* для добавления правил фаервола
+* Инстансу добавлен сетевые *tags* для применения правил фаервола
+* Добавлены [Provisioners](https://www.terraform.io/docs/provisioners/index.html), которые вызываются только в момент **создания/удаления** ресурса
+* В provisioners также добавлен файл *Systemd Unit service* [puma.service](terraform/files/puma.service) для автоматического запуска приожения reddit-app и скрипт деплоя [deploy.sh](terraform/files/deploy.sh)
+* Добавлен файл с описанием  input переменных [variables.tf](terraform/variables.tf) и заменены в main.tf (var.{ИМЯ ПЕРЕМЕННОЙ})
+  * Значения переменных вынесены в файл *terraform.tfvars*, который не индексирусется git-ом
