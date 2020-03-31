@@ -192,6 +192,7 @@ testapp_port = 9292
   * `terraform apply --auto-approve` - применить изменения с автоподтверждением
   * `terraform show` - показать текущее состаяние TF. К примерну показать внешний IP: `terraform show | grep nat_ip`
   * `terraform destroy` - удалить все созданные ресурсы
+  * `terraform fmt` - отформатировать файлы *.tf до "правильного" вида (синтаксис)
 * Добавлен SSH-ключ для подключения в metadata **инстанса**
 * Добавлен файл [outputs.tf](terraform/outputs.tf) для создания выхоных переменных
 * Добавлен ресурс *google_compute_firewall* для добавления правил фаервола
@@ -200,3 +201,10 @@ testapp_port = 9292
 * В provisioners также добавлен файл *Systemd Unit service* [puma.service](terraform/files/puma.service) для автоматического запуска приожения reddit-app и скрипт деплоя [deploy.sh](terraform/files/deploy.sh)
 * Добавлен файл с описанием  input переменных [variables.tf](terraform/variables.tf) и заменены в main.tf (var.{ИМЯ ПЕРЕМЕННОЙ})
   * Значения переменных вынесены в файл *terraform.tfvars*, который не индексирусется git-ом
+
+### Самостоятельные задания
+* Добавлены переменные зоны ресурса и приватного ключа для подключения провиженоров
+* Отформатированы файлы настроек для паривльного вида `terraform fmt`
+* Добавлен пример файла input переменных [terraform.tfvars.example](./terraform/terraform.tfvars.example)
+
+### Задание со *
