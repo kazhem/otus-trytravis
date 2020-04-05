@@ -208,3 +208,14 @@ testapp_port = 9292
 * Добавлен пример файла input переменных [terraform.tfvars.example](./terraform/terraform.tfvars.example)
 
 ### Задание со *
+* Добавлен [ресурс](https://www.terraform.io/docs/providers/google/r/compute_project_metadata_item.html) `google_compute_project_metadata_item` для того, чтобы добавить ключи пользователя в метаданные проекта (***важно** - данные в секции EOF должны обязательно начинаться с самого начала строки - лишние пробелы GCP не отрезает и работает некорректно*):
+  ```
+  resource "google_compute_project_metadata_item" "ssh_keys" {
+    key = "ssh-keys"
+    value = <<EOF
+  appuser1:${file(var.public_key_path)}
+  appuser2:${file(var.appuser2_public_key_path)}
+  EOF
+  }
+  ```
+* Если добавить ssh ключ через веб интерфейс и это не будет соответсвовать настройкам терраформа, то при `terraform apply` такой ключ будет удален.

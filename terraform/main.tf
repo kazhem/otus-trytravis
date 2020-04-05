@@ -30,6 +30,7 @@ resource "google_compute_instance" "app" {
   metadata = {
     # путь до публичного ключа
     ssh-keys = "appuser:${file(var.public_key_path)}"
+    block-project-ssh-keys = false
   }
   connection {
     type  = "ssh"
@@ -37,7 +38,7 @@ resource "google_compute_instance" "app" {
     user  = "appuser"
     agent = false
     # путь до приватного ключа
-    private_key = file(var.private_key)
+    private_key = file(var.private_key_path)
   }
   provisioner "file" {
     source      = "files/puma.service"
@@ -60,4 +61,12 @@ resource "google_compute_firewall" "firewall_puma" {
   source_ranges = ["0.0.0.0/0"]
   # Правило применимо для инстансов с перечисленными тэгами
   target_tags = ["reddit-app"]
+}
+
+resource "google_compute_project_metadata_item" "ssh_keys" {
+    key = "ssh-keys"
+    value = <<EOF
+appuser1:${file(var.public_key_path)}
+appuser2:${file(var.appuser2_public_key_path)}
+EOF
 }
