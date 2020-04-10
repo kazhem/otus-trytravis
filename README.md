@@ -263,4 +263,4 @@ testapp_port = 9292
   * Созан файл [db.tf](terraform/db.tf) описывающий ВМ для БД
   * Созан файл [app.tf](terraform/app.tf) описывающий  ВМ для Reddit app
   * Создан файл [vpc.tf](terraform/vpc.tf) описывающие правила фаервола
-*
+* Созадны модули `db` и `app`. Описанные выше файлы `db.tf` и `app.tf` перенесены в эти модули.
