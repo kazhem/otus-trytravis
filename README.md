@@ -219,3 +219,20 @@ testapp_port = 9292
   }
   ```
 * Если добавить ssh ключ через веб интерфейс и это не будет соответсвовать настройкам терраформа, то при `terraform apply` такой ключ будет удален.
+
+### Задание с **
+При разработке использовались следующие ресурсы из описания [документации](https://cloud.google.com/load-balancing/docs/https/):
+
+
+* Создан файл `lb.tf`, в котором описаны следующие сущности:
+  * [google_compute_instance_group](https://www.terraform.io/docs/providers/google/r/compute_instance_group.html) со списком инстансов ВМ с запущенным приложением (1 экземпляр)
+  * [google_compute_health_check](https://www.terraform.io/docs/providers/google/r/compute_health_check.html) для проверки доступности приложения на экземпляре ВМ
+  * [google_compute_backend_service](https://www.terraform.io/docs/providers/google/r/compute_backend_service.html) со ссылкой на группы экземпляров ВМ (в данном случае на 1 группу), а так же со ссылкой на google_compute_health_check
+  * [google_compute_url_map](https://www.terraform.io/docs/providers/google/r/compute_url_map.html) с описанием запросу к какому url на какой backend_service отправлять (в нашем случае все запросы ко всем url отправляются на 1 сервис)
+  * [google_compute_target_http_proxy](https://www.terraform.io/docs/providers/google/r/compute_target_http_proxy.html) для проксирования http/https соединений к url_map
+  * [google_compute_global_forwarding_rule](https://www.terraform.io/docs/providers/google/d/datasource_compute_forwarding_rule.html) для перенаправления ip4/ip6 трафика (для каждого типа трафика должно быть своё правило) на target_http_proxy (в нашем случае только ip4)
+* *Backend service долго стартует*
+* Был добавлен второй инстанс reddit-app (app2) в instance_group
+  * При отключении puma сервера видно, что по health-check доступен только один из двух инстансов. При этом приложение через LB остается доступным.
+  * При добавление нового инстанса копированием создается избыточное количество кода
+* Для добавления N одинкаовых инстаносов добавлен параметр `count` в `google_compute_instance`. Сама переменая задается в `variables.tf`

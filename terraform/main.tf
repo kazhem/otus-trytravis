@@ -13,7 +13,8 @@ provider "google" {
 }
 
 resource "google_compute_instance" "app" {
-  name         = "reddit-app"
+  count = var.instance_count
+  name         = "reddit-app${count.index}"
   machine_type = "g1-small"
   tags         = ["reddit-app"]
   zone         = var.zone
@@ -48,6 +49,7 @@ resource "google_compute_instance" "app" {
     script = "files/deploy.sh"
   }
 }
+
 resource "google_compute_firewall" "firewall_puma" {
   name = "allow-puma-default"
   # Название сети, в которой действует правило
