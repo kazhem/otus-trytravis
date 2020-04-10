@@ -236,3 +236,31 @@ testapp_port = 9292
   * При отключении puma сервера видно, что по health-check доступен только один из двух инстансов. При этом приложение через LB остается доступным.
   * При добавление нового инстанса копированием создается избыточное количество кода
 * Для добавления N одинкаовых инстаносов добавлен параметр `count` в `google_compute_instance`. Сама переменая задается в `variables.tf`
+
+## Homework7: Принципы организации инфраструктурного кода и работа над инфраструктурой в команде на примере Terraform
+
+* Заимпортирована текущие настройки terraform (ssh firewall rules)
+  ```
+  terraform import google_compute_firewall.firewall_ssh default-allow-ssh
+  ```
+* Добавлен ресурс [google_compute_address](https://www.terraform.io/docs/providers/google/r/compute_address.html) для того, чтобы иметь возможность обращаться к адресу инстанса из других ресурсов
+  ```
+  resource "google_compute_address" "app_ip" {
+  name = "reddit-app-ip"
+  }
+  ```
+* Для того чтобы использовать адрес внутри ресурса инстанса необходимо сослаться на него следующим образом (внутри инстанса ВМ). При этом ресурс ВМ становится зависимым от  ресурса `google_compute_address` и при создании инфорстрактуры создается после него.
+  ```
+  network_interface {
+    network = "default"
+    access_config {
+    nat_ip = google_compute_address.app_ip.address
+    }
+  }
+  ```
+* В директории packer созданы шаблоны [db.json](packer/db.json) и [app.json](packer/app.json) а затем по ним созданы образы семейста `reddit-db-base` и `reddit-app-base` соотвественном. На первом установлена БД MongoDB, на втором - Ruby.
+* Файл [main.tf](terraform/main.tf) разбит на несколько файлов, так, что в нем остался только описание версии тераформа и описание провайдера.
+  * Созан файл [db.tf](terraform/db.tf) описывающий ВМ для БД
+  * Созан файл [app.tf](terraform/app.tf) описывающий  ВМ для Reddit app
+  * Создан файл [vpc.tf](terraform/vpc.tf) описывающие правила фаервола
+*

@@ -1,11 +1,11 @@
 terraform {
   # Версия terraform
-  required_version = "~> 0.12.0"
+  required_version = "~>0.12.0"
 }
 
 provider "google" {
   # Версия провайдера
-  version = "~> 2.15"
+  version = ">=2.5.0"
 
   # ID проекта
   project = var.project
@@ -26,8 +26,11 @@ resource "google_compute_instance" "app" {
 
   network_interface {
     network = "default"
-    access_config {}
+    access_config {
+      nat_ip = google_compute_address.app_ip.addresss
+    }
   }
+
   metadata = {
     # путь до публичного ключа
     ssh-keys = "appuser:${file(var.public_key_path)}"
@@ -65,10 +68,24 @@ resource "google_compute_firewall" "firewall_puma" {
   target_tags = ["reddit-app"]
 }
 
+resource "google_compute_firewall" "firewall_ssh" {
+  name = "default-allow-ssh"
+  network = "default"
+  allow {
+    protocol = "tcp"
+    ports = ["22"]
+  }
+  source_ranges = ["0.0.0.0/0"]
+}
+
 resource "google_compute_project_metadata_item" "ssh_keys" {
     key = "ssh-keys"
     value = <<EOF
 appuser1:${file(var.public_key_path)}
 appuser2:${file(var.appuser2_public_key_path)}
 EOF
+}
+
+resource "google_compute_address" "app_ip" {
+  name = "reddit-app-ip"
 }
