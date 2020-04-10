@@ -72,3 +72,7 @@ resource "google_compute_global_forwarding_rule" "app_forwarding_rule" {
   target     = google_compute_target_http_proxy.app_proxy.self_link
   port_range = "80"
 }
+
+output "lb_external_ip" {
+  value = google_compute_global_forwarding_rule.app_forwarding_rule.ip_address
+}
