@@ -1,6 +1,6 @@
 terraform {
   backend "gcs" {
-    bucket  = "kazhemm-otus-tf-storage"
-    prefix  = "terraform/state/prod"
+    bucket = "kazhemm-otus-tf-storage"
+    prefix = "terraform/state/prod"
   }
 }
