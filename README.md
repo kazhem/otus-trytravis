@@ -321,3 +321,35 @@ testapp_port = 9292
   PLAY RECAP *****************************************************************************************
   appserver                  : ok=2    changed=1    unreachable=0    failed=0
   ```
+### Задание со *
+* Создан файл inventory.json в [формате](https://medium.com/@Nklya/динамическое-инвентори-в-ansible-9ee880d540d6) динмического инвентори. Создан из существуего файла inventory.yml (или ini).
+  ```
+  ansible-inventory --list > inventory.json
+  ```
+  *  Данный способ не совсем корректен, т.к. динамичский инвентори генерируется обычно из каких либо внешних источников. К примерну его можно сгенерировать с помощью плагина [gcp_compute](https://docs.ansible.com/ansible/latest/scenario_guides/guide_gce.html#gce-dynamic-inventory), который собирет информацию о машинах в GCP (не используется в силу ограничения задания)
+    ```
+    # ansible-inventory --list  -i inventory.gcp.yml
+    {
+    "_meta": {
+        "hostvars": {
+            "35.195.204.42": {
+                "canIpForward": false,
+                "cpuPlatform": "Intel Haswell",
+                "creationTimestamp": "2020-04-13T00:28:15.683-07:00",
+                "deletionProtection": false,
+                "disks": [
+                    {
+                        "autoDelete": true,
+                        "boot": true,
+                        "deviceName": "persistent-disk-0
+      ...
+    ```
+* Создан python скрипт `json_inventory.py`, который вовзращает содержимое json-инвентори по параметру `--list` и данные хоста с параметром `--host`.
+* Для того, чтобы использовать данный скрипт в качестве источника inventory по умолчаню, его можно прописать в `ansible.cfg` в качество значения ключа `inventory`:
+  ```
+  [defaults]
+  inventory = ./json_inventory.py
+  ...
+  ```
+* Вышеуказанный файл-плагин `inventory.gcp.yml` также можно указать в качестве инвентори, и тогда ansible будет динамически знать о вашей инфраструктуре GCP.
+* Команда `ansible all -m ping` выполнена успешно

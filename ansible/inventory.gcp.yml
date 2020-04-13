@@ -1,0 +1,10 @@
+---
+plugin: gcp_compute
+projects:
+  - infra-271611
+zones:
+  - "europe-west1-b"
+filters: []
+
+auth_kind: serviceaccount
+service_account_file: /home/kazhem/gcp-project-infra.json
