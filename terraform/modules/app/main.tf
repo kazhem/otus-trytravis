@@ -15,29 +15,6 @@ resource "google_compute_instance" "app" {
   metadata = {
     ssh-keys = "appuser:${file(var.public_key_path)}"
   }
-
-  connection {
-    type  = "ssh"
-    host  = self.network_interface[0].access_config[0].nat_ip
-    user  = "appuser"
-    agent = false
-    # путь до приватного ключа
-    private_key = file(var.private_key_path)
-  }
-
-  provisioner "file" {
-    source      = "${path.module}/files/puma.service"
-    destination = "/tmp/puma.service"
-  }
-
-  provisioner "file" {
-    content     = "DATABASE_URL=${var.database_url}"
-    destination = "/tmp/puma.env"
-  }
-
-  provisioner "remote-exec" {
-    script = "${path.module}/files/deploy.sh"
-  }
 }
 
 resource "google_compute_address" "app_ip" {
