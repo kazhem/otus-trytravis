@@ -305,7 +305,7 @@ testapp_port = 9292
 ## Homework8: Управление конфигурацией. Знакомство с Ansible
 * Установлен [Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
 * Создан [inventory.yml](ansible/inventory.yml) файл ([docs](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html))
-* Протестирована работа модулей `shell`, `command`, `service`, `systemd` и сделан вывод о том, что использование специальных модулей для выполениня определенных команд (`systemd`, `service`) дают больше возможностей для дальнейшего использования вывода этих команд.
+* Протестирована работа модулей `shell`, `command`, `service`, `systemd` и сделан вывод о том, что использование специальных модулей для выполнения определенных команд (`systemd`, `service`) дают больше возможностей для дальнейшего использования вывода этих команд.
 * Создан playbook [clone.yml](ansible/clone.yml), который использует модуль `git` для клонирования репозитория. Если при запуске плейбука директория после клонирования гита изменилась - ансибл пишет `changed`.
   ```
   ansible-playbook clone.yml
@@ -353,3 +353,39 @@ testapp_port = 9292
   ```
 * Вышеуказанный файл-плагин `inventory.gcp.yml` также можно указать в качестве инвентори, и тогда ansible будет динамически знать о вашей инфраструктуре GCP.
 * Команда `ansible all -m ping` выполнена успешно
+
+## Homework9: Продолжение знакомства с Ansible: templates, handlers, dynamic inventory, vault, tags
+* Создан playbook [reddit_app.yml](ansible/reddit_app.yml)
+  * Настроены сценарии для хоста MongoDB
+    * Создан шаблон [mongod.conf.j2](ansible/templates/mongod.conf.j2), который с помощью модуля `templates` в плейбуке копирует, подставляя нужные значения переменных, шаблон настройки mongod на ВМ
+    * Добавлены `tags` для того, чтобы была возможность запускать playbook только по каким-то определенным тагам.
+    * Определены переменные в плейбке в секции `vars` - они будут переданы в шаблон
+    * Добавлены `handlers`, которые вызываются из `tasks` по параметру `notify` - в данном случае `task`, при статусе `changed` вызывает `handler`, который рестартует сервис монги (с помощью модуля `service`)
+    * Предварительный запуск `ansible-playbook` с параметром `--check` проходится по списку тасков, но не применяет их. Аналог `terraform plan`
+      ```
+      ansible-playbook reddit_app.yml --check --limit db
+      ```
+    * Применение конфигурации
+      ```
+      ansible-playbook reddit_app.yml --limit db
+
+      PLAY [Configure hosts & deploy application] *******************************************************************
+
+      TASK [Gathering Facts] ****************************************************************************************
+      ok: [dbserver]
+
+      TASK [Change mongo config file] *******************************************************************************
+      changed: [dbserver]
+
+      RUNNING HANDLER [restart mongod] ******************************************************************************
+      changed: [dbserver]
+
+      PLAY RECAP ****************************************************************************************************
+      dbserver                   : ok=3    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+      ```
+  * Настроены сценарии для приложения
+    * С помощью модуля `copy` скопирован `unit.service` файл для сервера puma
+    * Добавлен таск, который через модуль `systemd` выставляет сирвису puma значение enabled
+    * Добавлен handler для перезапуска через `systemd` сервиса `puma`
+    * Добавлен шаблон для приложения, которые отвечает за определенных environment переменных
+  * Настроен деплой с помощью модулей `git` и `bundler`
