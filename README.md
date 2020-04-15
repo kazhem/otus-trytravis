@@ -391,3 +391,63 @@ testapp_port = 9292
   * Настроен деплой с помощью модулей `git` и `bundler`
 * Один play сценарий разделн на три (бд, приложение, деплой) в одном файле.
 * Далее разделили на три разных файла (`app.yml`, `db.yml`, `deploy.yml`), которые объеденины по средством `import_playbook` в `site.yml`
+
+###  Задание со *
+* В качестве dynamic inventory использован плагин [gcp_compute](https://docs.ansible.com/ansible/latest/scenario_guides/guide_gce.html#gce-dynamic-inventory), который был сконфигурирован в прошлом ДЗ
+  * [Пример](http://matthieure.me/2018/12/31/ansible_inventory_plugin.html) использования dynamic inventory вместе с параметром `keyed_groups` для группировки инстансов
+  * В файл [inventory.gcp.yml](ansible/inventory.gcp.yml) добавлены разделы:
+    * `hostnames` для отображения хостов по его имени в gcp
+      ```
+      hostnames:
+      - name
+      ```
+    * `compose` для задания переменных, которые будут доступны в плейбуках (`hostvars`) - данные переменны и так доступны в
+      ```
+      compose:
+      # add hostvar variables
+      ansible_host: networkInterfaces[0].accessConfigs[0].natIP # external ip
+      ansible_internal: networkInterfaces[0].networkIP # internal ip
+      ```
+      Чтобы посмотреть доступные переменные можно вывести их следущим образом из таска:
+      ```
+      - name: Debug
+        debug:
+          var: hostvars
+        tags:
+          - never
+          - debug
+      ```
+    * `keyed_groups` для распределения хостов по группам в зависмости от заданного значения в GCP (в данном случае labels)
+      ```
+      keyed_groups:
+        # Create groups from GCE labels
+        - prefix: ""
+          separator: ""
+          key: labels['group']
+      ```
+  * В настройки инстанса `terraform` app для параметра группировки добавлено
+    ```
+    labels       = {
+      group = "app"
+    }
+    ```
+  * В настройки инстанса `terraform` db для параметра группировки  добавлено
+    ```
+    labels       = {
+      group = "db"
+    }
+    ```
+  * В итоге, укав в `ansible.cfg` путь до динмического инвентори по умолчанию:
+    ```
+    #ansible-inventory --graph
+    @all:
+      |--@app:
+      |  |--reddit-app
+      |--@db:
+      |  |--reddit-db
+      |--@ungrouped:
+    ```
+  * В файле шаблона `db_config.j2` изменено значение переменной на:
+    ```
+    DATABASE_URL={{ hostvars[groups['db'][0]]['ansible_internal']}}
+    ```
