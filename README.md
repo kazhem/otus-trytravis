@@ -451,3 +451,72 @@ testapp_port = 9292
     ```
     DATABASE_URL={{ hostvars[groups['db'][0]]['ansible_internal']}}
     ```
+### Провижининг в Packer
+
+* Создан плейбук [packer_app.yml](ansible/packer_app.yml):
+  * Устанавливает Ruby и Bundler с помощью модуля [apt](https://docs.ansible.com/ansible/latest/modules/apt_module.html#apt-module)
+    ```
+    tasks:
+    - name: Install Ruby&Bundler
+      apt:
+        pkg:
+          - ruby-full
+          - ruby-bundler
+          - build-essential
+        update_cache: yes
+    ```
+* Создан плейбук [packer_db.yml](ansible/packer_db.yml):
+  * Добавляет публичный ключ GPG с помощью модуля [apt_key](https://docs.ansible.com/ansible/latest/modules/apt_key_module.html#apt-key-module)
+    ```
+    - name: Import MongoDB public GPG Key
+      apt_key:
+          keyserver: hkp://keyserver.ubuntu.com:80
+          id: 42F3E95A2C4F08279C4960ADD68FA50FEA312927
+    ```
+  * Добавлен репозиторий mongodb в список источников с помощью модуля [apt_repository](https://docs.ansible.com/ansible/latest/modules/apt_repository_module.html)
+    ```
+    - name: Add MongoDB repository into sources list
+      apt_repository:
+        repo: deb http://repo.mongodb.org/apt/ubuntu {{ansible_distribution_release}}/mongodb-org/3.2 multiverse
+        state: present
+    ```
+  * Установлен пакет `mongodb-org` c помощью [apt](https://docs.ansible.com/ansible/latest/modules/apt_module.html#apt-module)
+    ```
+    - name: Install MongoDB package
+      apt:
+        name: mongodb-org
+        update_cache: yes
+    ```
+  * В [systemd](https://docs.ansible.com/ansible/latest/modules/systemd_module.html#systemd-module) разрешен сервис mongod
+    ```
+    - name: enable mongod
+      systemd:
+        name: mongod
+        enabled: yes
+    ```
+* Эти плейбуки добавлены в качестве провиженоров в packer
+  ```
+  # packer/app.json
+  ...
+  "provisioners": [
+      {
+      "type": "ansible",
+      "playbook_file": "ansible/packer_app.yml"
+      }
+  ]
+  ...
+  ```
+  ```
+  # packer/db.json
+  ...
+  "provisioners": [
+    {
+      "type": "ansible",
+      "playbook_file": "ansible/packer_db.yml"
+    }
+  ]
+  ...
+  ```
+* Созданы образы с помощью packer
+* Созданы ВМ с помощью terraform
+* Запущен плейбук site.yml - приложение работает
