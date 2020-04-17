@@ -518,5 +518,13 @@ testapp_port = 9292
   ...
   ```
 * Созданы образы с помощью packer
+  ```
+  ...
+  ==> googlecompute: Provisioning with Ansible...
+  ==> googlecompute: Executing Ansible: ansible-playbook --extra-vars packer_build_name=googlecompute packer_builder_type=googlecompute -o IdentitiesOnly=yes -i /tmp/packer-provisioner-ansible187949315 /home/kazhem/develop/otus/kazhem_infra/ansible/packer_db.yml -e ansible_ssh_private_key_file=/tmp/ansible-key049835316
+      googlecompute:
+      googlecompute: PLAY [Install MongoDB] *********************************************************
+  ...
+  ```
 * Созданы ВМ с помощью terraform
 * Запущен плейбук site.yml - приложение работает
