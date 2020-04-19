@@ -1,0 +1,21 @@
+---
+plugin: gcp_compute
+projects:
+  - infra-271611
+zones:
+  - "europe-west1-b"
+
+hostnames:                # A list of options that describe the ordering for which hostnames should be assigned. Currently supported hostnames are 'public_ip', 'private_ip', or 'name'.
+- name
+compose:
+  # add hostvar variables
+  ansible_host: networkInterfaces[0].accessConfigs[0].natIP
+  ansible_internal: networkInterfaces[0].networkIP
+keyed_groups:
+  # Create groups from GCE labels
+  - prefix: ""
+    separator: ""
+    key: labels['group']
+
+auth_kind: serviceaccount
+service_account_file: ~/gcp-project-infra.json
