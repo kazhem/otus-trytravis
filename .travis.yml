@@ -4,19 +4,41 @@ language: bash
 before_install:
 # - curl https://raw.githubusercontent.com/express42/otus-homeworks/2020-02/run.sh |
 #   bash
-- mkdir bin
+  - mkdir bin
 install:
 # Install packer
-- wget https://releases.hashicorp.com/packer/1.5.5/packer_1.5.5_linux_amd64.zip -O packer-bin.zip &&
-  unzip packer-bin.zip -d bin/
+  - wget https://releases.hashicorp.com/packer/1.5.5/packer_1.5.5_linux_amd64.zip -O packer-bin.zip &&
+    unzip packer-bin.zip -d bin/
 # Install terraform
-- wget https://releases.hashicorp.com/terraform/0.12.24/terraform_0.12.24_linux_amd64.zip -O terraform-bin.zip &&
-  unzip terraform-bin.zip -d bin/
-# Install tflint
-- wget https://github.com/terraform-linters/tflint/releases/download/v0.15.4/tflint_linux_amd64.zip -O tflint-bin.zip &&
-  unzip tflint-bin.zip -d bin/
-# Install ansible
-- sudo pip install --upgrade pip && pip install -r ansible/requirements.txt
+  - wget https://releases.hashicorp.com/terraform/0.12.24/terraform_0.12.24_linux_amd64.zip -O terraform-bin.zip &&
+    unzip terraform-bin.zip -d bin/
+  # Install tflint
+  - wget https://github.com/terraform-linters/tflint/releases/download/v0.15.4/tflint_linux_amd64.zip -O tflint-bin.zip &&
+    unzip tflint-bin.zip -d bin/
+  # Install ansible
+  - sudo pip install --upgrade pip && pip install -r ansible/requirements.txt
+
+before_script:
+  # Create fake variables files
+  - cp packer/variables.json{.example}
+  - cp terraform/terraform.tfvars{.example}
+  - cp terraform/stage/terraform.tfvars{.example}
+  - cp terraform/prod/terraform.tfvars{.example}
+
+  # init terraform
+  - cd terraform && ../bin/terraform init -backend=false
+  - cd terraform/prod && ../../bin/terraform init -backend=false
+  - cd terraform/stage && ../../bin/terraform init -backend=false
+
+script:
+  # Validate packer
+  - for template in db app immutable ubuntu16; do echo "Validating $template.json"; packer validate -var-file packer/variables.json packer/$template.json;done
+  # Validate and tflint terraform
+  - cd terraform && ../bin/terraform validate && ../bin/tflint
+  - cd terraform/prod && ../../bin/terraform validate && ../../bin/tflint
+  - cd terraform/stage && ../../bin/terraform validate && ../../bin/tflint
+
+
 
 notifications:
   slack:
