@@ -2,8 +2,8 @@ dist: trusty
 sudo: required
 language: bash
 before_install:
-- curl https://raw.githubusercontent.com/express42/otus-homeworks/2020-02/run.sh |
-  bash
+  - curl https://raw.githubusercontent.com/express42/otus-homeworks/2020-02/run.sh |
+    bash
   - mkdir bin
 install:
 # Install packer
@@ -27,7 +27,7 @@ before_script:
 
   # init terraform
   - cd terraform && ../bin/terraform init -backend=false
-  - cd ./prod && ../../bin/terraform init -backend=false
+    - cd ./prod && ../../bin/terraform init -backend=false
   - cd ../stage && ../../bin/terraform init -backend=false
   - cd ../../
 
