@@ -36,8 +36,12 @@ script:
   - for template in db app immutable ubuntu16; do echo "Validating $template.json"; packer validate -var-file packer/variables.json packer/$template.json;done
   # Validate and tflint terraform
   - cd terraform && ../bin/terraform validate && ../bin/tflint
-  - cd terraform/prod && ../../bin/terraform validate && ../../bin/tflint
-  - cd terraform/stage && ../../bin/terraform validate && ../../bin/tflint
+  - cd ../prod && ../../bin/terraform validate && ../../bin/tflint
+  - cd ../stage && ../../bin/terraform validate && ../../bin/tflint
+  - cd ../../
+  # Valideate ansible linting
+  - ansible-lint ansible/playbooks/*.yml --exclude=ansible/roles/jdauphant.nginx -x ANSIBLE0004
+
 
 
 
