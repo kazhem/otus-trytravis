@@ -16,7 +16,7 @@ install:
   - wget https://github.com/terraform-linters/tflint/releases/download/v0.15.4/tflint_linux_amd64.zip -O tflint-bin.zip &&
     unzip tflint-bin.zip -d bin/
   # Install ansible
-  - sudo pip install --upgrade pip && pip install -r ansible/requirements.txt
+  - sudo pip install --upgrade pip && pip install ansible-lint
 
 before_script:
   # Create fake variables files
@@ -27,8 +27,11 @@ before_script:
 
   # init terraform
   - cd terraform && ../bin/terraform init -backend=false
+  - ls -la
   - cd ./prod && ../../bin/terraform init -backend=false
+  - ls -la
   - cd ../stage && ../../bin/terraform init -backend=false
+  - ls -la
   - cd ../../
 
 script:
