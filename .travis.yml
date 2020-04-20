@@ -16,7 +16,7 @@ install:
 - wget https://github.com/terraform-linters/tflint/releases/download/v0.15.4/tflint_linux_amd64.zip -O tflint-bin.zip &&
   unzip tflint-bin.zip -d bin/
 # Install ansible
-- pip install -r ansible/requirements.txt
+- pip3 install --upgrade pip && pip3 install -r ansible/requirements.txt
 
 notifications:
   slack:
