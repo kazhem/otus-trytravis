@@ -27,8 +27,9 @@ before_script:
 
   # init terraform
   - cd terraform && ../bin/terraform init -backend=false
-  - cd terraform/prod && ../../bin/terraform init -backend=false
-  - cd terraform/stage && ../../bin/terraform init -backend=false
+  - cd ./prod && ../../bin/terraform init -backend=false
+  - cd ../stage && ../../bin/terraform init -backend=false
+  - cd ../../
 
 script:
   # Validate packer
