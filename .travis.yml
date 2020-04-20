@@ -27,11 +27,8 @@ before_script:
 
   # init terraform
   - cd terraform && ../bin/terraform init -backend=false
-  - ls -la
   - cd ./prod && ../../bin/terraform init -backend=false
-  - ls -la
   - cd ../stage && ../../bin/terraform init -backend=false
-  - ls -la
   - cd ../../
 
 script:
@@ -39,7 +36,7 @@ script:
   - for template in db app immutable ubuntu16; do echo "Validating $template.json"; packer validate -var-file packer/variables.json packer/$template.json;done
   # Validate and tflint terraform
   - cd terraform && ../bin/terraform validate && ../bin/tflint
-  - cd ../prod && ../../bin/terraform validate && ../../bin/tflint
+  - cd ./prod && ../../bin/terraform validate && ../../bin/tflint
   - cd ../stage && ../../bin/terraform validate && ../../bin/tflint
   - cd ../../
   # Valideate ansible linting
