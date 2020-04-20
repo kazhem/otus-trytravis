@@ -20,10 +20,10 @@ install:
 
 before_script:
   # Create fake variables files
-  - cp packer/variables.json{.example}
-  - cp terraform/terraform.tfvars{.example}
-  - cp terraform/stage/terraform.tfvars{.example}
-  - cp terraform/prod/terraform.tfvars{.example}
+  - cp packer/variables.json{.example,}
+  - cp terraform/terraform.tfvars{.example,}
+  - cp terraform/stage/terraform.tfvars{.example,}
+  - cp terraform/prod/terraform.tfvars{.example,}
 
   # init terraform
   - cd terraform && ../bin/terraform init -backend=false
